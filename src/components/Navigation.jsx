@@ -82,6 +82,7 @@ function MyTabs() {
               style={{ width: size, height: size, tintColor: "#4F46E5" }}
             />
           ),
+          headerShown: false,
         }}
       />
       {/* <Tab.Screen

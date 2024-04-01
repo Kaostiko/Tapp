@@ -27,17 +27,21 @@ export const TappContextProvider = ({ children }) => {
       } catch (error) {
         if (error.response) {
           // El servidor respondió con un código de estado fuera del rango 2xx
-          console.error(
+          console.log(
             "Error al obtener los datos del usuario. Código de estado:",
             error.response.status
           );
-          console.error("Mensaje de error:", error.response.data);
+          console.log("Mensaje de error:", error.response.data);
         } else if (error.request) {
           // La solicitud fue realizada, pero no se recibió respuesta
-          console.error("Error al realizar la solicitud:", error.request);
+          if (userIdState) {
+            console.log("Error al realizar la solicitud:", error.request);
+          } else {
+            console.log("El usuario no está registrado.");
+          }
         } else {
           // Ocurrió un error al configurar la solicitud
-          console.error("Error:", error.message);
+          console.log("Error:", error.message);
         }
       }
     };
