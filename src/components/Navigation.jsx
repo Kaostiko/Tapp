@@ -6,7 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 // Screens
 import { Home } from "../screens/Home";
 import { Anadir } from "../screens/Anadir";
-import { Estadisticas } from "../screens/Estadisticas";
+import { Tickets } from "../screens/Tickets";
 import { ListaCompra } from "../screens/ListaCompra";
 import { Acceso } from "../screens/Acceso";
 import { Profile } from "../screens/user/Profile";
@@ -44,8 +44,8 @@ function MyTabs() {
         }}
       />
       <Tab.Screen
-        name="Estadísticas"
-        component={Estadisticas}
+        name="Tickets"
+        component={Tickets}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Image

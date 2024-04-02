@@ -1,5 +1,5 @@
 import CheckBox from "../components/CheckBox";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,11 +8,13 @@ import {
   Button,
   FlatList,
 } from "react-native";
+import { TappContext } from "../context/TappContext";
 
 export const ListaCompra = () => {
   const [newItem, setNewItem] = useState("");
   const [section, setSection] = useState("");
   const [shoppingList, setShoppingList] = useState([]);
+  const { isLogged } = useContext(TappContext);
 
   const addItem = () => {
     if (newItem.trim() !== "") {
@@ -37,40 +39,52 @@ export const ListaCompra = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lista de Compras</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nuevo ítem"
-        value={newItem}
-        onChangeText={(text) => setNewItem(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Sección"
-        value={section}
-        onChangeText={(text) => setSection(text)}
-      />
-      <View style={{ flexDirection: "row", gap: 10 }}>
-        <Button title="Añadir" onPress={addItem} />
-        <Button title="COMPRADO" onPress={CleanUp} />
-      </View>
-      <FlatList
-        data={shoppingList}
-        renderItem={({ item, index }) => (
-          <View style={styles.item}>
-            <CheckBox
-              checked={item.bought}
-              onPress={() => toggleBought(index)}
-            />
-            <Text
-              style={[styles.itemText, item.bought && styles.strikeThrough]}
-            >
-              {item.name} - {item.section}
+      {isLogged ? (
+        <>
+          <Text style={styles.title}>Lista de Compras</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nuevo ítem"
+            value={newItem}
+            onChangeText={(text) => setNewItem(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Sección"
+            value={section}
+            onChangeText={(text) => setSection(text)}
+          />
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Button title="Añadir" onPress={addItem} />
+            <Button title="COMPRADO" onPress={CleanUp} />
+          </View>
+          <FlatList
+            data={shoppingList}
+            renderItem={({ item, index }) => (
+              <View style={styles.item}>
+                <CheckBox
+                  checked={item.bought}
+                  onPress={() => toggleBought(index)}
+                />
+                <Text
+                  style={[styles.itemText, item.bought && styles.strikeThrough]}
+                >
+                  {item.name} - {item.section}
+                </Text>
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </>
+      ) : (
+        <>
+          <View style={styles.container}>
+            <Text style={styles.textWaring}>
+              Accede para poder crear listas de compra compartidas.
             </Text>
           </View>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
+        </>
+      )}
     </View>
   );
 };
@@ -111,5 +125,13 @@ const styles = StyleSheet.create({
   },
   strikeThrough: {
     textDecorationLine: "line-through",
+  },
+  textWaring: {
+    fontSize: 30,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: "#263D5A",
+    textAlign: "center",
+    padding: 60,
   },
 });

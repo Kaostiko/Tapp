@@ -12,10 +12,6 @@ export const TappContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [token, setToken] = useState("");
 
-  const salir = () => {
-    setToken("");
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,7 +57,6 @@ export const TappContextProvider = ({ children }) => {
         user,
         setToken,
         token,
-        salir,
       }}
     >
       {children}

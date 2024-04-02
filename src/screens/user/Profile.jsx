@@ -14,17 +14,21 @@ import { MyAvatar } from "../../components/MyAvatar";
 import { TappContext } from "../../context/TappContext";
 
 export const Profile = () => {
-  const { user, setToken, salir } = useContext(TappContext);
+  const { user, setToken, setIsLogged } = useContext(TappContext);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const salir = () => {
+    setToken("");
+    setIsLogged(false);
+  };
   // Validar que user no sea undefined y tenga al menos un elemento
-  /* if (!user || user.length === 0) {
+  if (!user || user.length === 0) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Cargando...</Text>
       </View>
     );
-  } */
+  }
 
   const openModal = () => {
     setModalVisible(true);
@@ -36,7 +40,7 @@ export const Profile = () => {
   };
 
   const { email, gender, image, name, last_name, telephone } = user;
-  console.log("Estado del modal: ", modalVisible);
+  // console.log("Estado del modal: ", modalVisible);
 
   return (
     <View style={styles.container}>
@@ -97,7 +101,9 @@ export const Profile = () => {
       >
         <View style={styles.modalContainer}>
           {/* Contenido del modal */}
-          <Text style={{ fontSize: 20 }}>Esto es un modal</Text>
+          <Text style={{ fontSize: 20 }}>
+            Esto es un modal // EDITAR USUARIO?
+          </Text>
           <Pressable style={styles.closeButton} onPress={closeModal}>
             <Text style={styles.buttonText}>Cerrar</Text>
           </Pressable>
