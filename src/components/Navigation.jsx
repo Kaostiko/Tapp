@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Image } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
+import colores from "../utils/colores";
 
 // Screens
 import { Home } from "../screens/Home";
@@ -11,7 +12,6 @@ import { ListaCompra } from "../screens/ListaCompra";
 import { Acceso } from "../screens/Acceso";
 import { Profile } from "../screens/user/Profile";
 import { TappContext } from "../context/TappContext";
-import { Mapas } from "../screens/Mapas";
 
 const Tab = createBottomTabNavigator();
 
@@ -37,7 +37,7 @@ function MyTabs() {
           tabBarIcon: ({ color, size }) => (
             <Image
               source={require("../../assets/icons/hogar.png")}
-              style={{ width: size, height: size, tintColor: "#4F46E5" }}
+              style={{ width: size, height: size, tintColor: colores.accent }}
             />
           ),
           headerShown: false,
@@ -49,10 +49,11 @@ function MyTabs() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Image
-              source={require("../../assets/icons/estadisticas.png")}
-              style={{ width: size, height: size, tintColor: "#4F46E5" }}
+              source={require("../../assets/icons/boleto.png")}
+              style={{ width: size, height: size, tintColor: colores.accent }}
             />
           ),
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -66,10 +67,11 @@ function MyTabs() {
               style={{
                 width: size,
                 height: size,
-                tintColor: "#4F46E5",
+                tintColor: colores.accent,
               }}
             />
           ),
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -79,7 +81,7 @@ function MyTabs() {
           tabBarIcon: ({ color, size }) => (
             <Image
               source={require("../../assets/icons/carrito.png")}
-              style={{ width: size, height: size, tintColor: "#4F46E5" }}
+              style={{ width: size, height: size, tintColor: colores.accent }}
             />
           ),
           headerShown: false,
@@ -92,7 +94,7 @@ function MyTabs() {
        tabBarIcon: ({ color, size }) => (
          <Image
            source={require("../../assets/icons/carrito.png")}
-           style={{ width: size, height: size, tintColor: "#4F46E5" }}
+           style={{ width: size, height: size, tintColor: colores.accent  }}
          />
        ),
      }}
@@ -106,9 +108,10 @@ function MyTabs() {
             tabBarIcon: ({ color, size }) => (
               <Image
                 source={require("../../assets/icons/perfil.png")}
-                style={{ width: size, height: size, tintColor: "#4F46E5" }}
+                style={{ width: size, height: size, tintColor: colores.accent }}
               />
             ),
+            headerShown: false,
           }}
         />
       ) : (
@@ -119,10 +122,16 @@ function MyTabs() {
           options={{
             tabBarIcon: ({ color, size }) => (
               <Image
-                source={require("../../assets/images/artist8.jpg")}
-                style={{ width: size, height: size, borderRadius: 50 }}
+                source={require("../../assets/icons/perfil.png")}
+                style={{
+                  width: size,
+                  height: size,
+                  borderRadius: 50,
+                  tintColor: colores.accent,
+                }}
               />
             ),
+            headerShown: false,
           }}
         />
       )}

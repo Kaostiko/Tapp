@@ -6,23 +6,22 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Alert,
 } from "react-native";
 import { TappContext } from "../context/TappContext";
-import * as Keychain from "react-native-keychain";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import colores from "../utils/colores";
 
 export const LoginUser = ({ toggleScreen }) => {
   const navigation = useNavigation();
   const {
     setIsLogged,
-    isLogged,
     setLogin,
     login,
     setUserisState,
-    setUser,
     setToken,
-    token,
+    userIdState,
   } = useContext(TappContext);
 
   const openRegister = () => {
@@ -41,17 +40,19 @@ export const LoginUser = ({ toggleScreen }) => {
 
   const onSubmit = () => {
     if (!inputLogin.email || !inputLogin.password) {
-      console.error("Email o contraseña no pueden estar vacíos");
+      Alert.alert("Email o contraseña no pueden estar vacíos");
       setShowMsg(true);
       return;
     }
     axios
-      .post("http://192.168.1.120:4000/user/login", inputLogin)
+      .post(`${process.env.EXPO_PUBLIC_API_URL}/user/login`, inputLogin)
       .then((res) => {
+        console.log("RESPUESTA", res);
         // console.log("DECODE TOKEN", res.data.token);
         setToken(res.data.token);
         // setUser(res.data.user);
         setUserisState(res.data.user.user_id);
+        console.log("ID :", userIdState);
         setIsLogged(true);
         navigation.navigate("Perfil");
         // Guardar el token en Keychain

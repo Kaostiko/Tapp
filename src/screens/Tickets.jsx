@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { TappContext } from "../context/TappContext";
 import axios from "axios";
+import colores from "../utils/colores";
+import BotonCustomizado from "../components/BotonCustomizado";
 
 export const Tickets = () => {
   const { user, isLogged } = useContext(TappContext);
@@ -19,15 +21,15 @@ export const Tickets = () => {
 
   useEffect(() => {
     axios
-      .get(`http://192.168.1.120:4000/ticket/getTickets/${user_id}`)
+      .get(`${process.env.EXPO_PUBLIC_API_URL}/ticket/getTickets/${user_id}`)
       .then((res) => {
+        // console.log("Respuesta del useEffect", res);
         setTickets(res.data);
-        // console.log(tickets);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [reloadTickets]);
+  }, [user_id, reloadTickets]);
 
   // Función para recargar los tickets
   const reloadTicketsHandler = () => {
@@ -37,9 +39,11 @@ export const Tickets = () => {
   // Para borrar los tickects:
   const deleteTicket = (ticket_id) => {
     axios
-      .post(`http://192.168.1.120:4000/ticket/deleteTicket/${ticket_id}`)
+      .post(
+        `${process.env.EXPO_PUBLIC_API_URL}/ticket/deleteTicket/${ticket_id}`
+      )
       .then((res) => {
-        console.log("EL RESULTADO: ", res.data);
+        // console.log("EL RESULTADO: ", res.data);
         // Recargar los tickets después de borrar uno
         setReloadTickets((prevState) => !prevState);
       })
@@ -54,28 +58,31 @@ export const Tickets = () => {
         {isLogged ? (
           <>
             <View style={styles.ticketsContainer}>
-              <Pressable
-                style={styles.botonUpdate}
+              <BotonCustomizado
+                title={"Actualizar tickets"}
+                customBackgroundColor={colores.accent}
                 onPress={reloadTicketsHandler}
-              >
-                <Text style={styles.buttonText}>Actualizar tickets</Text>
-              </Pressable>
+              />
+
               {tickets.map((ticket) => (
                 <View key={ticket.ticket_id} style={styles.ticket}>
-                  <View>
+                  <View style={styles.datos}>
                     <Text>Supermercado: {ticket.supermercado}</Text>
                     <Text>Fecha: {ticket.date}</Text>
                     <Text>Total: {ticket.amount} €</Text>
                   </View>
-                  <Pressable
-                    style={styles.botonDelete}
-                    onPress={() => deleteTicket(ticket.ticket_id)}
-                  >
-                    <Text style={styles.buttonText}>Borrar</Text>
-                  </Pressable>
-                  <Pressable style={styles.botonUpdate}>
-                    <Text style={styles.buttonText}>Ver</Text>
-                  </Pressable>
+                  <View>
+                    <BotonCustomizado
+                      title={"Borrar"}
+                      customBackgroundColor={colores.primary}
+                      onPress={() => deleteTicket(ticket.ticket_id)}
+                    />
+                    <BotonCustomizado
+                      title={"Ver"}
+                      customBackgroundColor={colores.accent}
+                      onPress={() => {}}
+                    />
+                  </View>
                 </View>
               ))}
             </View>
@@ -101,7 +108,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   scroll: {
-    // backgroundColor: "yellow",
     flex: 1,
     width: "100%",
   },
@@ -113,10 +119,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 60,
   },
+  datos: {
+    justifyContent: "space-evenly",
+  },
   ticketsContainer: {
     flex: 1,
-    // backgroundColor: "red",
-    marginTop: 20,
+    marginTop: 40,
     paddingHorizontal: 10,
   },
   ticket: {
@@ -124,25 +132,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 20,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: colores.accent,
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  botonUpdate: {
-    backgroundColor: "blue",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  botonDelete: {
-    backgroundColor: "red",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonText: {
-    margin: 10,
-    color: "white",
-    fontWeight: "bold",
   },
 });

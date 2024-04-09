@@ -1,5 +1,5 @@
-import CheckBox from "../components/CheckBox";
-import React, { useContext, useState } from "react";
+import CheckBox, { MyCheckbox } from "../components/CheckBox";
+import React, { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,34 +7,95 @@ import {
   TextInput,
   Button,
   FlatList,
+  Pressable,
 } from "react-native";
 import { TappContext } from "../context/TappContext";
+import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
+import colores from "../utils/colores";
+import BotonCustomizado from "../components/BotonCustomizado";
 
 export const ListaCompra = () => {
   const [newItem, setNewItem] = useState("");
-  const [section, setSection] = useState("");
   const [shoppingList, setShoppingList] = useState([]);
-  const { isLogged } = useContext(TappContext);
+  const [checkedItems, setCheckedItems] = useState([]);
+  const { isLogged, user } = useContext(TappContext);
+  const { user_id } = user;
 
-  const addItem = () => {
-    if (newItem.trim() !== "") {
-      setShoppingList([
-        ...shoppingList,
-        { name: newItem, section: section, bought: false },
-      ]);
+  useEffect(() => {
+    fetchShoppingList();
+  }, [user_id]);
+
+  const addItem = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URL}/listacompra/addProduct/${user_id}`,
+        {
+          name: newItem,
+          bought: false,
+        }
+      );
       setNewItem("");
-      setSection("");
+      await fetchShoppingList();
+    } catch (error) {
+      console.error("Error al enviar datos al backend:", error);
     }
   };
 
-  const toggleBought = (index) => {
-    const newList = [...shoppingList];
-    newList[index].bought = !newList[index].bought;
-    setShoppingList(newList);
+  const fetchShoppingList = async () => {
+    try {
+      if (!user_id) {
+        // No hay usuario, por lo que no hacemos nada
+        return;
+      }
+      const response = await axios.get(
+        `${process.env.EXPO_PUBLIC_API_URL}/listacompra/getLista/${user_id}`
+      );
+      const fetchedShoppingList = response.data;
+      const checkedItemsArray = fetchedShoppingList.map(
+        (item) => item.bought === 1
+      );
+      setCheckedItems(checkedItemsArray);
+      setShoppingList(fetchedShoppingList);
+    } catch (error) {
+      console.error("Error al obtener la lista de compras:", error);
+    }
   };
 
-  const CleanUp = () => {
-    setShoppingList([]);
+  const toggleBought = async (index) => {
+    const newList = [...checkedItems];
+    newList[index] = !newList[index];
+    setCheckedItems(newList);
+
+    try {
+      const productId = shoppingList[index].shopping_list_id;
+      const newBoughtState = newList[index];
+
+      // Determinar la URL del endpoint según el nuevo estado del producto
+      const endpoint = newBoughtState
+        ? `${process.env.EXPO_PUBLIC_API_URL}/listacompra/checkProduct/${productId}`
+        : `${process.env.EXPO_PUBLIC_API_URL}/listacompra/uncheckProduct/${productId}`;
+
+      console.log(endpoint);
+      // Enviar solicitud al endpoint correspondiente
+      const response = await axios.put(endpoint, { bought: newBoughtState });
+      console.log("Producto actualizado en el backend:", response.data);
+    } catch (error) {
+      console.error("Error al actualizar producto en el backend:", error);
+    }
+  };
+
+  const CleanUp = async () => {
+    try {
+      const response = await axios.delete(
+        `${process.env.EXPO_PUBLIC_API_URL}/listacompra/clearList/${user_id}`
+      );
+      console.log("Lista eliminada en el backend:", response.data);
+      setShoppingList([]);
+      setCheckedItems([]);
+    } catch (error) {
+      console.error("Error al eliminar lista en el backend:", error);
+    }
   };
 
   return (
@@ -44,32 +105,45 @@ export const ListaCompra = () => {
           <Text style={styles.title}>Lista de Compras</Text>
           <TextInput
             style={styles.input}
-            placeholder="Nuevo ítem"
+            placeholder="Artículo para comprar"
+            placeholderTextColor={colores.accent}
             value={newItem}
             onChangeText={(text) => setNewItem(text)}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Sección"
-            value={section}
-            onChangeText={(text) => setSection(text)}
-          />
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <Button title="Añadir" onPress={addItem} />
-            <Button title="COMPRADO" onPress={CleanUp} />
+          <View style={{ flexDirection: "row", gap: 10, marginBottom: 20 }}>
+            <BotonCustomizado
+              title={"AÑADIR"}
+              customBackgroundColor={colores.accent}
+              onPress={addItem}
+            />
+            <BotonCustomizado
+              title={"BORRAR LISTA"}
+              customBackgroundColor={colores.primary}
+              onPress={CleanUp}
+            />
           </View>
           <FlatList
             data={shoppingList}
             renderItem={({ item, index }) => (
               <View style={styles.item}>
-                <CheckBox
-                  checked={item.bought}
+                <Pressable
+                  style={[
+                    styles.checkboxBase,
+                    checkedItems[index] && styles.checkboxChecked,
+                  ]}
                   onPress={() => toggleBought(index)}
-                />
-                <Text
-                  style={[styles.itemText, item.bought && styles.strikeThrough]}
                 >
-                  {item.name} - {item.section}
+                  {checkedItems[index] && (
+                    <Ionicons name="checkmark" size={18} color="white" />
+                  )}
+                </Pressable>
+                <Text
+                  style={[
+                    styles.itemText,
+                    checkedItems[index] && styles.strikeThrough,
+                  ]}
+                >
+                  {item.name}
                 </Text>
               </View>
             )}
@@ -100,13 +174,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
+    margin: 25,
+    color: colores.primary,
   },
   input: {
     height: 40,
     width: "100%",
-    borderColor: "gray",
-    // borderWidth: 1,
+    borderColor: colores.accent,
     borderBottomWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
@@ -117,8 +191,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     margin: 5,
-    // padding: 10,
-    // backgroundColor: "red",
   },
   itemText: {
     marginLeft: 10,
@@ -130,8 +202,25 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     fontStyle: "italic",
-    color: "#263D5A",
+    color: colores.primary,
     textAlign: "center",
     padding: 60,
+  },
+  checkboxBase: {
+    width: 24,
+    height: 24,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: colores.accent,
+    backgroundColor: "transparent",
+  },
+  checkboxChecked: {
+    backgroundColor: colores.accent,
+  },
+  boton: {
+    backgroundColor: "red",
+    color: "red",
   },
 });

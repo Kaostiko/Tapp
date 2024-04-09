@@ -3,6 +3,8 @@ import { Button, StyleSheet, Text, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
 import { TappContext } from "../context/TappContext";
+import colores from "../utils/colores";
+import BotonCustomizado from "../components/BotonCustomizado";
 
 export const Anadir = () => {
   const { user, isLogged } = useContext(TappContext);
@@ -30,7 +32,10 @@ export const Anadir = () => {
       formData.append("file", pdfFile);
       console.log("FORMDATA: ", formData);
       const { data } = await axios
-        .post(`http://192.168.1.120:4000/ticket/addTicket/${user_id}`, formData)
+        .post(
+          `${process.env.EXPO_PUBLIC_API_URL}/ticket/addTicket/${user_id}`,
+          formData
+        )
         .then((res) => console.log("RESPUESTA CORRECTA", res))
         .catch((error) => console.log("Algo falló: ", error));
       // console.log("Esto es DATA", data);
@@ -43,11 +48,10 @@ export const Anadir = () => {
     <View style={styles.container}>
       {isLogged ? (
         <>
-          <Text style={styles.text}>Sube y guarda tus tickets </Text>
-          <Button
-            title="Sube ticket"
+          <BotonCustomizado
+            title={"SUBIR TICKET"}
+            customBackgroundColor={colores.accent}
             onPress={pickPDF}
-            style={styles.upBoton}
           />
         </>
       ) : (
@@ -65,27 +69,15 @@ export const Anadir = () => {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "#263D5A",
-    fontVariant: "white",
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  text: {
-    color: "#78D0A2",
-    margin: 20,
-    textAlign: "center",
-  },
-  upBoton: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "blue",
   },
   textWaring: {
     fontSize: 30,
     fontWeight: "bold",
     fontStyle: "italic",
-    color: "#263D5A",
+    color: colores.primary,
     textAlign: "center",
     padding: 60,
   },

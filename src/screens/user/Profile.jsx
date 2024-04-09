@@ -5,22 +5,27 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
-  Button,
   Pressable,
-  ScrollView,
   Modal,
+  SafeAreaView,
+  TextInput,
 } from "react-native";
-import { MyAvatar } from "../../components/MyAvatar";
 import { TappContext } from "../../context/TappContext";
+import axios from "axios";
+import * as ImagePicker from "expo-image-picker";
+import colores from "../../utils/colores";
+import BotonCustomizado from "../../components/BotonCustomizado";
 
 export const Profile = () => {
-  const { user, setToken, setIsLogged } = useContext(TappContext);
+  const { user, setToken, setIsLogged, setUser } = useContext(TappContext);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [editableUser, setEditableUser] = useState({}); // Estado para los valores editables
+  const { name_user, last_name, user_id } = user;
   const salir = () => {
     setToken("");
     setIsLogged(false);
   };
+
   // Validar que user no sea undefined y tenga al menos un elemento
   if (!user || user.length === 0) {
     return (
@@ -32,82 +37,145 @@ export const Profile = () => {
 
   const openModal = () => {
     setModalVisible(true);
-    console.log("Esta visibilidad: ", modalVisible);
+    setEditableUser({ ...user });
+    // console.log("Esta visibilidad: ", modalVisible);
   };
   const closeModal = () => {
     setModalVisible(false);
-    console.log("Esta visibilidad: ", modalVisible);
+    setEditableUser({}); // Limpiar el estado editable
+    // console.log("Esta visibilidad: ", modalVisible);
   };
 
-  const { email, gender, image, name, last_name, telephone } = user;
+  // Función para manejar los cambios en los inputs del modal
+  const handleChange = (name, value) => {
+    setEditableUser({ ...editableUser, [name]: value });
+  };
+
+  // Función para enviar los cambios al backend y actualizar el usuario
+  const handleSubmit = () => {
+    axios
+      .put(
+        `${process.env.EXPO_PUBLIC_API_URL}/user/editUser/${user_id}`,
+        editableUser
+      )
+      .then((res) => {
+        console.log("ESITABLEEEEEEEEE", editableUser);
+        console.log("Usuario actualizado:", res.data);
+        setUser(res.data);
+        // Actualizar el usuario en el contexto o realizar cualquier otra acción necesaria
+        closeModal();
+      })
+      .catch((err) => {
+        console.log("Error al actualizar el usuario:", err);
+      });
+  };
+
   // console.log("Estado del modal: ", modalVisible);
 
+  // Poner en mayúscula primera letra:
+  const capitalize = (t) => {
+    if (!t) return ""; // Manejar casos de cadena vacía o null
+    return t[0].toUpperCase() + t.slice(1);
+  };
+
+  // Seleccionar imagen para cambiar la del perfil.
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setEditableUser({ ...editableUser, image: result.uri });
+    }
+  };
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../../../assets/images/dog.jpg")}
-        style={styles.background}
-        resizeMode="cover"
-      >
-        <>
-          <View style={styles.content}>
-            {/* <MyAvatar
-              backgroundColor="#4F46E5"
-              size={50}
-              borderRadius={50}
-              fallbackText="SS"
-            /> */}
+      <View style={styles.content}>
+        <Image
+          source={require("../../../assets/icons/perfil.png")}
+          style={styles.profileImage}
+        />
+        <Text style={styles.title}>
+          {capitalize(name_user)} {capitalize(last_name)}
+        </Text>
+      </View>
+      <View style={styles.botones}>
+        <BotonCustomizado
+          title={"SALIR"}
+          customBackgroundColor={colores.primary}
+          onPress={salir}
+        />
+        <BotonCustomizado
+          title={"EDITAR"}
+          customBackgroundColor={colores.accent}
+          onPress={openModal}
+        />
+      </View>
+      {/* Modal de edición */}
+      <Modal animationType="slide" visible={modalVisible}>
+        <SafeAreaView style={styles.modalContainer}>
+          <Text style={styles.modalHeader}>Edición de usuario:</Text>
+
+          {/* Componente para mostrar la imagen seleccionada */}
+          {user.image ? (
             <Image
-              source={require("../../../assets/images/artist8.jpg")}
-              style={styles.profileImage}
+              source={{ uri: editableUser.image }}
+              style={{ width: 100, height: 100, marginBottom: 20 }}
             />
-            <Text style={styles.title}>
-              {name} {last_name}
-            </Text>
+          ) : (
+            <Image
+              source={require("../../../assets/icons/perfil.png")}
+              style={{
+                width: 100,
+                height: 100,
+                marginBottom: 20,
+                tintColor: colores.accent,
+              }}
+            />
+          )}
+
+          {/* Botón para abrir la galería de fotos */}
+          <BotonCustomizado
+            title={"Seleccionar imagen"}
+            customBackgroundColor={colores.accent}
+            onPress={pickImage}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre"
+            value={editableUser.name_user}
+            onChangeText={(text) => handleChange("name_user", text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido"
+            value={editableUser.last_name}
+            onChangeText={(text) => handleChange("last_name", text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Telefono"
+            value={editableUser.telephone}
+            onChangeText={(text) => handleChange("telephone", text)}
+          />
+
+          {/* Botones para confirmar o cancelar la edición */}
+          <View style={styles.botones}>
+            <BotonCustomizado
+              title={"GUARDAR"}
+              customBackgroundColor={colores.accent}
+              onPress={handleSubmit}
+            />
+            <BotonCustomizado
+              title={"CANCELAR"}
+              customBackgroundColor={colores.primary}
+              onPress={closeModal}
+            />
           </View>
-          <View style={styles.content}>
-            <Text style={styles.title}>Email</Text>
-            <Text style={styles.title}>{email}</Text>
-          </View>
-          <View style={styles.content}>
-            <Text style={styles.title}>Telefono</Text>
-            <Text style={styles.title}>{telephone}</Text>
-          </View>
-          <View style={styles.content}>
-            <Text style={styles.title}>Genero</Text>
-            <Text style={styles.title}>{gender}</Text>
-          </View>
-          {/* <Button title="SALIR" onPress={salir} style={styles.button} /> */}
-          <View style={{ flexDirection: "row", gap: 15, margin: 15 }}>
-            <Pressable style={styles.button} onPress={salir}>
-              <Text style={styles.buttonText}>Salir</Text>
-            </Pressable>
-            <Pressable style={styles.button} onPress={openModal}>
-              <Text style={styles.buttonText}>Editar</Text>
-            </Pressable>
-            <Pressable style={styles.button} onPress={closeModal}>
-              <Text style={styles.buttonText}>Cerrar Modal</Text>
-            </Pressable>
-          </View>
-        </>
-      </ImageBackground>
-      <Modal
-        animationType="slide"
-        visible={modalVisible}
-        style={{ backgroundColor: "red", marginTop: 100 }}
-        // onRequestClose={() => {
-        //   setModalVisible(!modalVisible);
-        // }}
-      >
-        <View style={styles.modalContainer}>
-          {/* Contenido del modal */}
-          <Text style={{ fontSize: 20 }}>
-            Esto es un modal // EDITAR USUARIO?
-          </Text>
-          <Pressable style={styles.closeButton} onPress={closeModal}>
-            <Text style={styles.buttonText}>Cerrar</Text>
-          </Pressable>
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   );
@@ -116,50 +184,56 @@ export const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#4F46E5",
-  },
-  background: {
-    flex: 1,
-    justifyContent: "flex-start",
+    justifyContent: "center",
     alignItems: "center",
+    gap: 60,
   },
   content: {
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: colores.accent,
     padding: 20,
+    marginTop: 25,
     borderRadius: 10,
     alignItems: "center",
-    justifyContent: "space-evenly",
+    justifyContent: "space-around",
     flexDirection: "row",
-    gap: 25,
     width: "90%",
-    marginTop: 25,
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#4F46E5",
-  },
-  closeButton: {
-    backgroundColor: "#4F46E5",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 50,
-  },
-  button: {
-    backgroundColor: "#4F46E5",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFF",
+    // fontWeight: "bold",
+    color: "#fff",
   },
   profileImage: {
-    width: 100, // Ajusta el tamaño de la imagen según sea necesario
-    height: 100, // Ajusta el tamaño de la imagen según sea necesario
-    borderRadius: 50, // Hace que la imagen tenga forma circular
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    tintColor: colores.text_primary,
+  },
+  modalContainer: {
+    flex: 1,
+    marginTop: 120,
+    alignItems: "center",
+  },
+  modalHeader: {
+    fontSize: 30,
+    textAlign: "center",
+    margin: 20,
+    color: colores.primary,
+  },
+  input: {
+    color: colores.accent,
+    width: "70%",
+    fontSize: 15,
+    fontStyle: "italic",
+    borderBottomWidth: 1,
+    borderBottomColor: colores.accent,
+    marginVertical: 30,
+  },
+  botones: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    gap: 15,
+    margin: 15,
   },
 });

@@ -34,16 +34,18 @@ export const Registro = ({ toggleScreen }) => {
     e.preventDefault();
     console.log("Justo antes del axios");
     axios
-      .post("http://192.168.1.120:4000/user/registerUser", inputRegister)
+      .post(
+        `${process.env.EXPO_PUBLIC_API_URL}/user/registerUser`,
+        inputRegister
+      )
       .then((res) => {
         console.log("RESPUESTA CORRECTA", res);
-        navigation.navigate("Home");
+        setInputRegister("");
+        toggleScreen();
       })
       .catch((err) => {
         console.log(err);
       });
-
-    // setInputRegister("");
   };
 
   return (

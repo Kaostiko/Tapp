@@ -14,36 +14,36 @@ export const TappContextProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        // Realizar la consulta al servidor para obtener los datos del usuario
-        const response = await axios.get(
-          `http://192.168.1.120:4000/user/getOneUser/${userIdState}`
-        );
-        setUser(response.data); // Establecer los datos del usuario en el estado
-      } catch (error) {
-        if (error.response) {
-          // El servidor respondió con un código de estado fuera del rango 2xx
-          console.log(
-            "Error al obtener los datos del usuario. Código de estado:",
-            error.response.status
+      if (token && userIdState) {
+        try {
+          const response = await axios.get(
+            `${process.env.EXPO_PUBLIC_API_URL}/user/getOneUser/${userIdState}`
           );
-          console.log("Mensaje de error:", error.response.data);
-        } else if (error.request) {
-          // La solicitud fue realizada, pero no se recibió respuesta
-          if (userIdState) {
-            console.log("Error al realizar la solicitud:", error.request);
+          setUser(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(
+              "Error al obtener los datos del usuario. Código de estado:",
+              error.response.status
+            );
+            console.log("Mensaje de error:", error.response.data);
+          } else if (error.request) {
+            // La solicitud fue realizada, pero no se recibió respuesta
+            if (userIdState) {
+              console.log("Error al realizar la solicitud:", error.request);
+            } else {
+              console.log("El usuario no está registrado.");
+            }
           } else {
-            console.log("El usuario no está registrado.");
+            // Ocurrió un error al configurar la solicitud
+            console.log("Error:", error.message);
           }
-        } else {
-          // Ocurrió un error al configurar la solicitud
-          console.log("Error:", error.message);
         }
       }
     };
 
     fetchData();
-  }, [token, userIdState]);
+  }, [token, userIdState, user]);
 
   return (
     <TappContext.Provider
@@ -57,6 +57,7 @@ export const TappContextProvider = ({ children }) => {
         user,
         setToken,
         token,
+        userIdState,
       }}
     >
       {children}

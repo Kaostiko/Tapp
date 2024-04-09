@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,18 +6,56 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import * as ImagePicker from "expo-image-picker";
+import { TappContext } from "../../context/TappContext";
+
+const initialValue = {
+  name_user: "",
+  last_name: "",
+  telephone: "",
+  image: "",
+};
 
 export const EditUser = () => {
   const navigation = useNavigation();
+  const { user, setUser } = useContext(TappContext);
+
+  const [editInput, setEditInput] = useState(initialValue);
+
+  useEffect(() => {
+    if (user) {
+      setEditInput({
+        ...editInput,
+        name_user: user.name_user !== null ? user.name_user : "",
+        last_name: user.last_name !== null ? user.last_name : "",
+        telephone: user.telephone !== null ? user.telephone : "",
+      });
+    }
+  }, [user]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditInputs({ ...editInputs, [name]: value });
+  };
   return (
-    <View>
-      <Text>Vamos a editar la información del usuario</Text>
-      <Pressable style={styles.button} onPress={navigation("Perfil")}>
-        <Text style={styles.buttonText}>Volver</Text>
-      </Pressable>
-    </View>
+    <Modal
+      animationType="slide"
+      visible={modalVisible}
+      style={{ backgroundColor: "red", marginTop: 100 }}
+    >
+      <View style={styles.modalContainer}>
+        <Text style={{ fontSize: 20 }}>
+          Esto es un modal // EDITAR USUARIO?
+        </Text>
+        <Pressable style={styles.closeButton} onPress={closeModal}>
+          <Text style={styles.buttonText}>Cerrar</Text>
+        </Pressable>
+      </View>
+    </Modal>
   );
 };
 

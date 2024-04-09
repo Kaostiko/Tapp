@@ -1,135 +1,105 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ScrollView,
-  Pressable,
-} from "react-native";
-import { Anadir } from "./Anadir";
-import { useNavigation } from "@react-navigation/native";
+import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
+import colores from "../utils/colores";
 
 export const Home = () => {
-  const navigation = useNavigation(); //
-
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <View>
-          <Text
-            style={{
-              fontSize: 30,
-              textAlign: "center",
-              paddingHorizontal: 10,
-            }}
-          >
-            Lleva el control de tus gastos en supermercados.
-          </Text>
-          <Text
-            style={{ fontSize: 30, textAlign: "center", paddingHorizontal: 10 }}
-          >
-            Compara precios y saca información de tus compras.{" "}
-          </Text>
+    <>
+      <ScrollView>
+        <View style={styles.maincontainer}>
+          <View style={styles.container}>
+            <Text style={styles.text_header}>Tappea tu tickets</Text>
+            <Image
+              source={{
+                uri: "https://financialfood.es/wp-content/uploads/2023/02/compra-supermercado-010223.jpg",
+              }}
+              style={styles.image}
+            />
+            <Text style={styles.text_header}>y tenlo siempre a mano.</Text>
+          </View>
+          <View style={styles.subcontainer}>
+            <View>
+              <Text style={styles.subcontainer_text_header}>
+                ¿Cómo usar la aplicación?
+              </Text>
+            </View>
+            <View style={styles.subcontainer_children}>
+              <Text style={styles.subcontainer_text}>
+                1-. Haz tu lista de la compra
+              </Text>
+              <Image
+                source={require("../../assets/icons/verification.png")}
+                style={styles.icono}
+              />
+              <Text style={styles.subcontainer_text}>2-. Sube tus tickets</Text>
+              <Image
+                source={require("../../assets/icons/boleto.png")}
+                style={styles.icono}
+              />
+              <Text style={styles.subcontainer_text}>
+                3-. Ten a mano tus tickets y obten información.
+              </Text>
+              <Image
+                source={require("../../assets/icons/ahorros.png")}
+                style={styles.icono}
+              />
+            </View>
+          </View>
         </View>
-        <View style={{ gap: 20, paddingVertical: 35 }}>
-          <Image
-            source={{
-              uri: "https://financialfood.es/wp-content/uploads/2023/02/compra-supermercado-010223.jpg",
-            }}
-            style={{ height: 205, width: 400, borderColor: "red" }}
-          />
-        </View>
-        <View>
-          <Text
-            style={{
-              fontSize: 30,
-              textAlign: "center",
-              paddingHorizontal: 10,
-              paddingBottom: 30,
-            }}
-          >
-            Ten a mano siempre lo tickets y saca información de ellos
-          </Text>
-        </View>
-        <View
-          style={{
-            gap: 20,
-            paddingVertical: 35,
-            backgroundColor: "#ACCBFF",
-            width: 400,
-            paddingHorizontal: 20,
-            flexDirection: "row",
-          }}
-        >
-          <Image
-            source={require("../../assets/icons/clouds.png")}
-            style={{ height: 75, width: 75, borderColor: "#fff" }}
-          />
-          <Image
-            source={require("../../assets/icons/rainy.png")}
-            style={{ height: 75, width: 75, borderColor: "#fff" }}
-          />
-          <Image
-            source={require("../../assets/icons/snow.png")}
-            style={{ height: 75, width: 75, borderColor: "#fff" }}
-          />
-          <Image
-            source={require("../../assets/icons/sunny.png")}
-            style={{ height: 75, width: 75, borderColor: "#fff" }}
-          />
-        </View>
-        <View>
-          <Text
-            style={{
-              fontSize: 30,
-              textAlign: "center",
-              paddingHorizontal: 10,
-              paddingVertical: 30,
-            }}
-          >
-            ¿Cómo usar la aplicación?
-          </Text>
-        </View>
-        <View
-          style={{
-            gap: 20,
-            paddingVertical: 35,
-            width: 400,
-            paddingHorizontal: 20,
-            alignItems: "center",
-          }}
-        >
-          <Pressable onPress={() => navigation.navigate(Anadir)}>
-            <Text style={{ fontSize: 20 }}>1-. Carga tu tickets</Text>
-          </Pressable>
-          <Image
-            source={require("../../assets/icons/boleto.png")}
-            style={{ height: 150, width: 150, borderColor: "#fff" }}
-          />
-          <Text style={{ fontSize: 20 }}>2-. Confirma los productos</Text>
-          <Image
-            source={require("../../assets/icons/verification.png")}
-            style={{ height: 150, width: 150, borderColor: "#fff" }}
-          />
-          <Text style={{ fontSize: 20 }}>
-            3-. Saca información de tus compras y ten a mano tus tickets
-          </Text>
-          <Image
-            source={require("../../assets/icons/ahorros.png")}
-            style={{ height: 150, width: 150, borderColor: "#fff" }}
-          />
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  maincontainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    marginVertical: 10,
     justifyContent: "center",
+    backgroundColor: "white",
+  },
+  text_header: {
+    fontSize: 30,
+    textAlign: "center",
+    paddingHorizontal: 10,
+    fontStyle: "italic",
+    fontWeight: "bold",
+    paddingVertical: 30,
+    color: colores.primary,
+  },
+  subcontainer: {
+    backgroundColor: colores.accent,
+    flex: 1,
+    borderRadius: 25,
+  },
+  image: {
+    height: 205,
+    width: 400,
+  },
+  subcontainer_text_header: {
+    fontSize: 30,
+    textAlign: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 30,
+    color: colores.text_primary,
+  },
+  subcontainer_text: {
+    color: colores.text_primary,
+    fontSize: 20,
+    textAlign: "center",
+  },
+  icono: {
+    height: 150,
+    width: 150,
+    tintColor: colores.bg_primary,
+  },
+  subcontainer_children: {
+    gap: 20,
+    width: 400,
     alignItems: "center",
+    backgroundColor: colores.accent,
+    paddingBottom: 40,
   },
 });
