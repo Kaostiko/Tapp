@@ -12,6 +12,7 @@ import { TappContext } from "../context/TappContext";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import colores from "../utils/colores";
+import BotonCustomizado from "./BotonCustomizado";
 
 export const LoginUser = ({ toggleScreen }) => {
   const navigation = useNavigation();
@@ -32,7 +33,6 @@ export const LoginUser = ({ toggleScreen }) => {
     email: "",
     password: "",
   });
-  const [showMsg, setShowMsg] = useState(false);
 
   const handleChange = (name, value) => {
     setInputLogin({ ...inputLogin, [name]: value });
@@ -41,26 +41,24 @@ export const LoginUser = ({ toggleScreen }) => {
   const onSubmit = () => {
     if (!inputLogin.email || !inputLogin.password) {
       Alert.alert("Email o contraseña no pueden estar vacíos");
-      setShowMsg(true);
       return;
     }
     axios
       .post(`${process.env.EXPO_PUBLIC_API_URL}/user/login`, inputLogin)
       .then((res) => {
-        console.log("RESPUESTA", res);
-        // console.log("DECODE TOKEN", res.data.token);
         setToken(res.data.token);
-        // setUser(res.data.user);
         setUserisState(res.data.user.user_id);
-        console.log("ID :", userIdState);
         setIsLogged(true);
         navigation.navigate("Perfil");
-        // Guardar el token en Keychain
-        // Keychain.setGenericPassword("token", res.data);
-        // console.log("Ha guardado correctamente token.", res.data);
-        // setIsLogged("Vuelvo a ponerlo en false################");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          Alert.alert("Email o contraseña no válidos");
+        } else {
+          console.log(err);
+          Alert.alert("Ha ocurrido un error. Por favor, intenta de nuevo.");
+        }
+      });
   };
 
   return (
@@ -69,9 +67,10 @@ export const LoginUser = ({ toggleScreen }) => {
         <View style={styles.modal}>
           <Text style={styles.title}>Accede a tu cuenta</Text>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
+              placeholder="Email"
+              placeholderTextColor={colores.accent}
               onChangeText={(text) => handleChange("email", text)}
               value={inputLogin.email}
               autoCompleteType="email"
@@ -79,9 +78,10 @@ export const LoginUser = ({ toggleScreen }) => {
             />
           </View>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Contraseña</Text>
             <TextInput
               style={styles.input}
+              placeholder="Contraseña"
+              placeholderTextColor={colores.accent}
               onChangeText={(text) => handleChange("password", text)}
               value={inputLogin.password}
               secureTextEntry={true}
@@ -92,15 +92,21 @@ export const LoginUser = ({ toggleScreen }) => {
               <Text style={styles.buttonText}>ACEPTAR</Text>
             </TouchableOpacity>
           </View>
-          {showMsg && (
-            <Text style={styles.errorText}>Email o contraseña incorrectos</Text>
-          )}
-          <Text style={styles.registerText}>
-            ¿No estás registrado?{" "}
-            <Pressable onPress={toggleScreen}>
-              <Text style={styles.registerLink}>Date de alta</Text>
+          <View
+            style={{
+              marginTop: 40,
+            }}
+          >
+            <Pressable
+              onPress={toggleScreen}
+              style={{ justifyContent: "center" }}
+            >
+              <Text style={styles.registerText}>
+                ¿No estás registrado?{" "}
+                <Text style={styles.registerLink}>Date de alta</Text>
+              </Text>
             </Pressable>
-          </Text>
+          </View>
         </View>
       )}
     </View>
@@ -114,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modal: {
-    backgroundColor: "#4F46E5",
+    backgroundColor: colores.accent,
     padding: 20,
     borderRadius: 10,
     width: "80%",
@@ -124,10 +130,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: "#fff",
+    color: colores.text_primary,
   },
   inputContainer: {
-    marginBottom: 10,
+    marginVertical: 10,
   },
   label: {
     color: "#fff",
@@ -144,27 +150,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: "#fff",
+    backgroundColor: colores.bg_primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 10,
   },
   buttonText: {
-    color: "#4F46E5",
+    color: colores.accent,
     fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    marginTop: 10,
   },
   registerText: {
-    color: "#fff",
-    textAlign: "center",
-    marginTop: 40,
+    color: colores.text_primary,
   },
   registerLink: {
-    color: "#fff",
+    color: colores.text_primary,
     fontWeight: "bold",
+    fontStyle: "italic",
   },
 });

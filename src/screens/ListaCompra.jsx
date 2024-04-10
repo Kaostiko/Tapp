@@ -8,6 +8,7 @@ import {
   Button,
   FlatList,
   Pressable,
+  Alert,
 } from "react-native";
 import { TappContext } from "../context/TappContext";
 import axios from "axios";
@@ -27,6 +28,11 @@ export const ListaCompra = () => {
   }, [user_id]);
 
   const addItem = async () => {
+    // Verificar si el campo de nuevo artículo está vacío
+    if (!newItem.trim()) {
+      Alert.alert("El campo de artículo está vacío.");
+      return;
+    }
     try {
       const response = await axios.post(
         `${process.env.EXPO_PUBLIC_API_URL}/listacompra/addProduct/${user_id}`,
@@ -39,6 +45,10 @@ export const ListaCompra = () => {
       await fetchShoppingList();
     } catch (error) {
       console.error("Error al enviar datos al backend:", error);
+      // Manejar el error y mostrar un mensaje al usuario si es necesario
+      Alert.alert(
+        "Error al enviar datos al backend. Por favor, intenta de nuevo."
+      );
     }
   };
 

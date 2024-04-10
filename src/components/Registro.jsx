@@ -8,13 +8,10 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
-import { TappContext } from "../context/TappContext";
 import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import colores from "../utils/colores";
 
 export const Registro = ({ toggleScreen }) => {
-  const { login } = useContext(TappContext);
-  const navigation = useNavigation();
   const [inputRegister, setInputRegister] = useState({
     name_user: "",
     last_name: "",
@@ -25,21 +22,20 @@ export const Registro = ({ toggleScreen }) => {
     gender: "",
   });
 
+  const [selectedGender, setSelectedGender] = useState(""); // Estado para el género seleccionado
+
   const handleChange = (name, value) => {
     setInputRegister({ ...inputRegister, [name]: value });
   };
 
   const onSubmit = (e) => {
-    console.log("INPUTTTTTTTTTTTTTTT", inputRegister);
     e.preventDefault();
-    console.log("Justo antes del axios");
     axios
       .post(
         `${process.env.EXPO_PUBLIC_API_URL}/user/registerUser`,
         inputRegister
       )
       .then((res) => {
-        console.log("RESPUESTA CORRECTA", res);
         setInputRegister("");
         toggleScreen();
       })
@@ -55,28 +51,28 @@ export const Registro = ({ toggleScreen }) => {
           <TextInput
             style={styles.input}
             placeholder="Nombre"
-            placeholderTextColor="white"
+            placeholderTextColor={colores.accent}
             value={inputRegister.name_user}
             onChangeText={(text) => handleChange("name_user", text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Apellido"
-            placeholderTextColor="white"
+            placeholderTextColor={colores.accent}
             value={inputRegister.last_name}
             onChangeText={(text) => handleChange("last_name", text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor="white"
+            placeholderTextColor={colores.accent}
             value={inputRegister.email}
             onChangeText={(text) => handleChange("email", text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Contraseña"
-            placeholderTextColor="white"
+            placeholderTextColor={colores.accent}
             secureTextEntry={true}
             value={inputRegister.password}
             onChangeText={(text) => handleChange("password", text)}
@@ -84,37 +80,76 @@ export const Registro = ({ toggleScreen }) => {
           <TextInput
             style={styles.input}
             placeholder="Teléfono"
-            placeholderTextColor="white"
+            placeholderTextColor={colores.accent}
             value={inputRegister.telephone}
             onChangeText={(text) => handleChange("telephone", text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Año de nacimiento"
-            placeholderTextColor="white"
+            placeholderTextColor={colores.accent}
             keyboardType="numeric"
             value={inputRegister.year_birth}
             onChangeText={(text) => handleChange("year_birth", text)}
           />
           <View style={styles.radioContainer}>
-            <Text>Género:</Text>
+            <Text style={styles.radioLabel}>Género:</Text>
             <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => handleChange("gender", "M")}
+              style={[
+                styles.radioButton,
+                selectedGender === "M" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                handleChange("gender", "M");
+                setSelectedGender("M");
+              }}
             >
-              <Text style={styles.radioText}>Hombre</Text>
+              <Text
+                style={[
+                  styles.radioText,
+                  selectedGender === "M" && styles.selectedText,
+                ]}
+              >
+                Hombre
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => handleChange("gender", "F")}
+              style={[
+                styles.radioButton,
+                selectedGender === "F" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                handleChange("gender", "F");
+                setSelectedGender("F");
+              }}
             >
-              <Text style={styles.radioText}>Mujer</Text>
+              <Text
+                style={[
+                  styles.radioText,
+                  selectedGender === "F" && styles.selectedText,
+                ]}
+              >
+                Mujer
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => handleChange("gender", "Otro")}
+              style={[
+                styles.radioButton,
+                selectedGender === "Otro" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                handleChange("gender", "Otro");
+                setSelectedGender("Otro");
+              }}
             >
-              <Text style={styles.radioText}>Otro</Text>
+              <Text
+                style={[
+                  styles.radioText,
+                  selectedGender === "Otro" && styles.selectedText,
+                ]}
+              >
+                Otro
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -122,15 +157,19 @@ export const Registro = ({ toggleScreen }) => {
           <TouchableOpacity style={styles.button} onPress={onSubmit}>
             <Text style={styles.buttonText}>ACEPTAR</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>CERRAR</Text>
-          </TouchableOpacity>
         </View>
-        <Pressable onPress={toggleScreen}>
-          <Text style={styles.loginText}>
-            ¿Ya tienes cuenta? <Text style={styles.loginLink}>Entra</Text>
-          </Text>
-        </Pressable>
+        <View
+          style={{
+            marginTop: 40,
+            alignItems: "center",
+          }}
+        >
+          <Pressable onPress={toggleScreen}>
+            <Text style={styles.loginText}>
+              ¿Ya tienes cuenta? <Text style={styles.loginLink}>Entra</Text>
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -138,35 +177,29 @@ export const Registro = ({ toggleScreen }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#4F46E5",
-    /* margin: 20, */
+    backgroundColor: colores.accent,
     padding: 20,
     borderRadius: 10,
     width: "80%",
-    height: "80%",
     color: "white",
   },
   formContainer: {
-    width: "90%",
     marginBottom: 20,
   },
   input: {
-    height: 40,
-    borderColor: "gray",
+    paddingVertical: 8,
+    backgroundColor: colores.bg_primary,
     fontStyle: "italic",
-    borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 10,
+    marginBottom: 15,
     paddingHorizontal: 10,
   },
   radioContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    color: "white",
+    margin: 10,
   },
   radioButton: {
     marginRight: 10,
@@ -175,30 +208,38 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: "#ccc",
   },
+  selectedButton: {
+    backgroundColor: colores.bg_primary,
+    borderColor: colores.bg_primary,
+  },
   radioText: {
-    color: "#333",
+    color: colores.text_primary,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
+  selectedText: {
+    color: colores.accent,
   },
+  radioLabel: {
+    color: colores.text_primary,
+    marginRight: 5,
+  },
+
   button: {
-    backgroundColor: "#4F46E5",
-    padding: 10,
-    borderRadius: 5,
-    width: "40%",
+    backgroundColor: colores.bg_primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: colores.accent,
     fontWeight: "bold",
   },
   loginText: {
-    marginTop: 20,
+    color: colores.text_primary,
   },
   loginLink: {
-    color: "white",
+    color: colores.text_primary,
     fontWeight: "bold",
+    fontStyle: "italic",
   },
 });
