@@ -21,7 +21,6 @@ Puedes ejecutar la aplicación en diferentes plataformas utilizando los siguient
 
 ## Dependencias Principales
 
-- **@react-native-community/slider**: Componente deslizante para React Native.
 - **@react-navigation/bottom-tabs**: Biblioteca de navegación para crear pestañas en la parte inferior de la aplicación.
 - **@react-navigation/native**: Biblioteca de navegación para React Native.
 - **axios**: Cliente HTTP para realizar solicitudes a servidores.
@@ -31,7 +30,6 @@ Puedes ejecutar la aplicación en diferentes plataformas utilizando los siguient
 - **react-native**: Biblioteca principal de React Native.
 - **react-native-gesture-handler**: Manejador de gestos nativos para React Native.
 - **react-native-google-places-autocomplete**: Componente de autocompletado de lugares de Google para React Native.
-- **react-native-keychain**: Biblioteca para gestionar el almacenamiento seguro de datos confidenciales en React Native.
 - **react-native-modal**: Biblioteca para mostrar modales en React Native.
 - **react-native-safe-area-context**: Contexto para manejar el área segura en React Native.
 - **react-native-screens**: Implementación de navegación basada en pantalla para React Native.

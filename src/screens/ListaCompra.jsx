@@ -97,10 +97,10 @@ export const ListaCompra = () => {
 
   const CleanUp = async () => {
     try {
-      const response = await axios.delete(
-        `${process.env.EXPO_PUBLIC_API_URL}/listacompra/clearList/${user_id}`
+      const response = await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URL}/listacompra/cleanList/${user_id}`
       );
-      console.log("Lista eliminada en el backend:", response.data);
+      // console.log("Lista eliminada en el backend:", response.data);
       setShoppingList([]);
       setCheckedItems([]);
     } catch (error) {
